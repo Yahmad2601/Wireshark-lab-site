@@ -77,4 +77,13 @@ app.get('/', (req, res) => {
 // /login (GET form, POST cleartext urlencoded creds, sets lab.sid cookie), /logout
 app.use('/', require('./routes/login'));
 
+// /search — GET query string lands in the URL (leaks into logs/history)
+app.use('/', require('./routes/search'));
+
+// /register — multi-field urlencoded POST body (email, phone, dropdown, checkbox)
+app.use('/', require('./routes/register'));
+
+// /upload — multipart/form-data via multer (Export Objects carves the file out)
+app.use('/', require('./routes/upload'));
+
 module.exports = app;

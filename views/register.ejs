@@ -1,0 +1,54 @@
+<section>
+  <h1>Register</h1>
+  <p class="lede">
+    This form POSTs several different field types — text, email, phone, a
+    <code>&lt;select&gt;</code> dropdown, and a checkbox — all packed into one
+    <code>application/x-www-form-urlencoded</code> body.
+  </p>
+
+  <form class="lab-form" method="POST" action="/register">
+    <label for="fullname">Full name</label>
+    <input id="fullname" name="fullname" type="text" value="Pat Student" autocomplete="off">
+
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" value="pat@example.lab" autocomplete="off">
+
+    <label for="phone">Phone</label>
+    <input id="phone" name="phone" type="tel" value="+1-555-0100" autocomplete="off">
+
+    <label for="plan">Plan</label>
+    <select id="plan" name="plan">
+      <% plans.forEach(function (pl) { %>
+        <option value="<%= pl %>"><%= pl %></option>
+      <% }); %>
+    </select>
+
+    <label style="display:flex;align-items:center;gap:8px;">
+      <input name="newsletter" type="checkbox" checked style="width:auto;"> Send me the lab newsletter
+    </label>
+
+    <button type="submit">Create account</button>
+  </form>
+
+  <% if (submitted) { %>
+    <h2>Server received</h2>
+    <ul>
+      <li>fullname: <code><%= submitted.fullname %></code></li>
+      <li>email: <code><%= submitted.email %></code></li>
+      <li>phone: <code><%= submitted.phone %></code></li>
+      <li>plan: <code><%= submitted.plan %></code></li>
+      <li>newsletter: <code><%= submitted.newsletter %></code></li>
+    </ul>
+    <p class="tip">Nothing is stored — this only echoes what the wire carried.</p>
+  <% } %>
+</section>
+
+<section>
+  <h2>Capture this</h2>
+  <ul>
+    <li>Display filter: <code>http.request.method == "POST" &amp;&amp; http.request.uri == "/register"</code></li>
+    <li><strong>Follow → HTTP Stream</strong> to read the full body: <code>fullname=…&amp;email=…&amp;phone=…&amp;plan=…&amp;newsletter=on</code>.</li>
+    <li>Spot the URL-encoding: <code>@</code> → <code>%40</code>, space → <code>+</code> or <code>%20</code>.</li>
+    <li>Uncheck the box and resend: the <code>newsletter</code> key disappears entirely — unchecked checkboxes send nothing.</li>
+  </ul>
+</section>

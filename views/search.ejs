@@ -1,0 +1,42 @@
+<section>
+  <h1>Search</h1>
+  <p class="lede">
+    This form uses <code>method="GET"</code>, so everything you type is appended
+    to the URL as a query string — it appears in the very first line of the
+    HTTP request: <code>GET /search?q=…</code>.
+  </p>
+
+  <form class="lab-form" method="GET" action="/search">
+    <label for="q">Search query</label>
+    <input id="q" name="q" type="text" value="<%= q %>" placeholder="e.g. tcp handshake">
+
+    <label for="secret">"Sensitive" field (don't use anything real)</label>
+    <input id="secret" name="secret" type="text" value="<%= secret %>" placeholder="e.g. account-12345">
+
+    <button type="submit">Search</button>
+  </form>
+
+  <% if (q || secret) { %>
+    <p class="tip">
+      Notice the address bar (and the captured <code>GET</code> line) now
+      contains <code>q=<%= q %></code><%= secret ? ` &amp; secret=${secret}` : '' %>.
+      A POST would have hidden these in the body — GET cannot.
+    </p>
+  <% } %>
+
+  <% if (results.length) { %>
+    <h2>Results</h2>
+    <ul>
+      <% results.forEach(function (r) { %><li><%= r %></li><% }); %>
+    </ul>
+  <% } %>
+</section>
+
+<section>
+  <h2>Capture this</h2>
+  <ul>
+    <li>Display filter: <code>http.request.method == "GET" &amp;&amp; http.request.uri contains "/search"</code></li>
+    <li>Look at the request line — the query string is right there in the URI, in cleartext.</li>
+    <li>Lesson: URLs land in server logs, browser history, and proxies. GET is the wrong place for secrets.</li>
+  </ul>
+</section>

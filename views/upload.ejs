@@ -1,0 +1,42 @@
+<section>
+  <h1>Upload</h1>
+  <p class="lede">
+    This form uses <code>enctype="multipart/form-data"</code>. The file's raw
+    bytes travel across the wire inside the request body, framed by a multipart
+    boundary. Over plain HTTP nothing is encrypted — the whole file is right
+    there in the capture.
+  </p>
+
+  <form class="lab-form" method="POST" action="/upload" enctype="multipart/form-data">
+    <label for="file">Choose a small file (no real/sensitive data)</label>
+    <input id="file" name="file" type="file">
+
+    <label for="note">Optional note (a sibling text part)</label>
+    <input id="note" name="note" type="text" placeholder="e.g. demo image">
+
+    <button type="submit">Upload</button>
+  </form>
+
+  <% if (uploaded) { %>
+    <h2>Server received</h2>
+    <ul>
+      <li>filename: <code><%= uploaded.originalname %></code></li>
+      <li>content type: <code><%= uploaded.mimetype %></code></li>
+      <li>size: <code><%= uploaded.size %></code> bytes</li>
+      <% if (uploaded.note) { %><li>note: <code><%= uploaded.note %></code></li><% } %>
+    </ul>
+  <% } %>
+</section>
+
+<section>
+  <h2>Capture this</h2>
+  <ul>
+    <li>Display filter: <code>http.request.method == "POST" &amp;&amp; http.request.uri == "/upload"</code></li>
+    <li><strong>Follow → HTTP Stream</strong> to see the multipart boundary, the
+      <code>Content-Disposition: form-data; name="file"; filename="…"</code> part
+      header, then the raw file bytes.</li>
+    <li><strong>File → Export Objects → HTTP</strong>, find the request, and
+      <em>Save</em> — Wireshark reconstructs the original uploaded file from the
+      packets.</li>
+  </ul>
+</section>
