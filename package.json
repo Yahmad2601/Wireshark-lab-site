@@ -8,7 +8,7 @@
     "start": "node src/server-http.js",
     "start:http": "node src/server-http.js",
     "start:https": "node src/server-https.js",
-    "gen-cert": "node -e \"console.log('Run the openssl command from README.md to generate certs/key.pem and certs/cert.pem')\""
+    "gen-cert": "node src/gen-cert.js"
   },
   "dependencies": {
     "ejs": "3.1.10",
