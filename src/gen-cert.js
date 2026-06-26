@@ -10,8 +10,10 @@
 //     -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { isPrivateIPv4 } = require('./guard');
 
 const CERT_DIR = path.join(__dirname, '..', 'certs');
 const KEY = path.join(CERT_DIR, 'key.pem');
@@ -19,11 +21,32 @@ const CERT = path.join(CERT_DIR, 'cert.pem');
 
 fs.mkdirSync(CERT_DIR, { recursive: true });
 
+// Add every private IPv4 on this machine to the cert's SAN, so the HTTPS twin
+// validates when reached over the LAN (e.g. https://192.168.1.5:8443) and not
+// just over localhost. Re-run gen-cert if your LAN IP changes.
+function privateIPv4s() {
+  const out = [];
+  const ifaces = os.networkInterfaces();
+  for (const name of Object.keys(ifaces)) {
+    for (const ni of ifaces[name] || []) {
+      if (ni.internal || ni.family !== 'IPv4') continue;
+      if (isPrivateIPv4(ni.address)) out.push(ni.address);
+    }
+  }
+  return [...new Set(out)];
+}
+
+const sanEntries = ['DNS:localhost', 'IP:127.0.0.1'];
+for (const ip of privateIPv4s()) sanEntries.push('IP:' + ip);
+const san = sanEntries.join(',');
+
+console.log('  Certificate SAN: ' + san);
+
 const args = [
   'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '365',
   '-keyout', KEY, '-out', CERT,
   '-subj', '/CN=localhost',
-  '-addext', 'subjectAltName=DNS:localhost,IP:127.0.0.1',
+  '-addext', 'subjectAltName=' + san,
 ];
 
 // Prefer openssl on PATH; otherwise fall back to common Windows locations

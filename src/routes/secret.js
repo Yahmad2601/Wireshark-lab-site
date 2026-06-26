@@ -3,10 +3,12 @@
 const express = require('express');
 const router = express.Router();
 
-// HTTP Basic Auth credentials. Fake, seeded, shown in the UI. (Distinct from
-// the form-login user so students can tell the two lessons apart on the wire.)
-const BASIC_USER = 'agent';
-const BASIC_PASS = 'base64isnotencryption';
+// HTTP Basic Auth credentials. The SAME single seeded demo user as /login
+// (CLAUDE.md: seed one demo user). So the captured header is exactly
+//   Authorization: Basic c3R1ZGVudDpwYWNrZXRzMTIz  ==  base64("student:packets123")
+// which is the value the README worksheet tells students to decode.
+const BASIC_USER = 'student';
+const BASIC_PASS = 'packets123';
 
 // GET /secret — HTTP Basic Auth. The browser sends
 //   Authorization: Basic YWdlbnQ6YmFzZTY0aXNub3RlbmNyeXB0aW9u

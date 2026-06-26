@@ -10,6 +10,55 @@ to use and what students should observe.
 
 ---
 
+## Getting it onto a lab machine (students start here)
+
+**Prerequisite:** install **Node.js LTS** (which includes `npm`) from
+<https://nodejs.org>. Verify it:
+
+```bash
+node --version
+npm --version
+```
+
+**1. Download the project** — either clone with Git:
+
+```bash
+git clone https://github.com/Yahmad2601/Wireshark-lab-site.git
+cd Wireshark-lab-site
+```
+
+…or, if you don't have Git, download the ZIP from the GitHub repo
+(green **Code** button → **Download ZIP**), extract it, and open a terminal in
+the extracted folder.
+
+**2. Install dependencies** (one time, needs internet *for this step only* —
+the app itself makes no external calls once running):
+
+```bash
+npm install
+```
+
+**3. Generate the HTTPS cert** (one time, for the HTTP-vs-HTTPS lesson):
+
+```bash
+npm run gen-cert
+```
+
+**4. Start a server and open it in the browser:**
+
+```bash
+npm run start:http      # then browse to http://127.0.0.1:8080
+# and/or, in a second terminal:
+npm run start:https     # then browse to https://127.0.0.1:8443  (accept the self-signed warning)
+```
+
+Log in with the seeded demo user **`student` / `packets123`** (fake creds). To
+reach the site from a *different* device on the lab network, see
+[Accessing it from other devices](#accessing-it-from-other-devices-on-the-lab-lan)
+below.
+
+---
+
 ## Running it
 
 ```bash
@@ -28,6 +77,46 @@ Seeded demo login: **username** `student` · **password** `packets123`
 
 Capture on the interface carrying lab traffic. On localhost, capture on the
 loopback adapter; on a lab LAN, capture on the relevant Ethernet/WiFi NIC.
+
+---
+
+## Accessing it from other devices on the lab LAN
+
+By default both servers bind to `127.0.0.1` (loopback) — reachable only from
+this machine. To reach the site from another device on the same isolated
+network, bind to a private LAN address with the `HOST` env var:
+
+```powershell
+# Option A — bind this machine's specific LAN IP (e.g. 192.168.1.5)
+$env:HOST="192.168.1.5"; npm run start:http
+$env:HOST="192.168.1.5"; npm run start:https
+
+# Option B — bind ALL interfaces. The startup guard allows 0.0.0.0 ONLY when
+# every non-loopback address on this machine is private; if any interface has a
+# public address it refuses (use --allow-public to override on an isolated lab).
+$env:HOST="0.0.0.0"; npm run start:http
+```
+
+```bash
+# macOS / Linux equivalent
+HOST=192.168.1.5 npm run start:http
+HOST=0.0.0.0     npm run start:http
+```
+
+Then, from the other device, browse to `http://<lan-ip>:8080` or
+`https://<lan-ip>:8443`.
+
+Notes:
+- The guard permits private binds (`10.x`, `172.16–31.x`, `192.168.x`) and the
+  `0.0.0.0` wildcard on an all-private machine. A genuinely public bind still
+  requires the explicit `--allow-public` flag.
+- `npm run gen-cert` automatically adds every private IPv4 on this machine to
+  the certificate's SAN, so the HTTPS twin validates over the LAN without a
+  name-mismatch warning. **Re-run `gen-cert` if your LAN IP changes** (DHCP
+  leases move).
+- The first time Node binds to a non-loopback interface, Windows may prompt to
+  allow it through the firewall — allow it for your current network profile,
+  or it stays unreachable.
 
 ---
 
