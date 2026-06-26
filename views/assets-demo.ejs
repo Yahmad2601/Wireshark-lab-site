@@ -1,0 +1,37 @@
+<link rel="stylesheet" href="/public/css/assets-demo.css">
+
+<section>
+  <h1>Assets demo</h1>
+  <p class="lede">
+    Loading this one page pulls in <strong>several local assets</strong> — two
+    stylesheets, two scripts, and four images. Each is a separate HTTP request,
+    fired close together over the same kept-alive TCP connection(s).
+  </p>
+
+  <div class="tile-grid">
+    <img src="/public/img/sample.png" alt="sample">
+    <img src="/public/img/tile-a.png" alt="tile a">
+    <img src="/public/img/tile-b.png" alt="tile b">
+    <img src="/public/img/tile-c.png" alt="tile c">
+  </div>
+
+  <p class="asset-note">Images referenced by this page:
+    <strong id="asset-count">…</strong></p>
+</section>
+
+<section>
+  <h2>Capture this</h2>
+  <ul>
+    <li>Reload with your capture running, then filter
+      <code>http.request.uri contains "/public/"</code> to list every asset request.</li>
+    <li>See many GETs in quick succession — practice narrowing:
+      <code>http.request.uri contains ".png"</code>,
+      <code>http.request.uri contains ".css"</code>.</li>
+    <li>Watch HTTP keep-alive: multiple requests reuse the same TCP stream
+      (follow <code>tcp.stream eq &lt;n&gt;</code>) instead of a new handshake each time.</li>
+    <li>Spot <code>304 Not Modified</code> on a second reload — the browser
+      revalidates cached assets.</li>
+  </ul>
+</section>
+
+<script src="/public/js/assets-demo.js"></script>

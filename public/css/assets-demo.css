@@ -1,0 +1,15 @@
+/* Second, separate stylesheet so /assets-demo fires an extra CSS request. */
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 64px);
+  gap: 12px;
+  margin: 16px 0;
+}
+.tile-grid img {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  display: block;
+}
+.asset-note { color: var(--muted); }

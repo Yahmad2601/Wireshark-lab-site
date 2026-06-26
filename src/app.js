@@ -86,4 +86,27 @@ app.use('/', require('./routes/register'));
 // /upload — multipart/form-data via multer (Export Objects carves the file out)
 app.use('/', require('./routes/upload'));
 
+// /api/data — JSON response (Content-Type: application/json dissection)
+app.use('/', require('./routes/api'));
+
+// /secret — HTTP Basic Auth (Authorization: Basic is Base64, not encryption)
+app.use('/', require('./routes/secret'));
+
+// /broken (404), /redirect (302 chain), /error (500) — status-code lessons
+app.use('/', require('./routes/status'));
+
+// /assets-demo — one page pulling several local assets (parallel requests, keep-alive)
+app.use('/', require('./routes/assets-demo'));
+
+// --- Error handler ----------------------------------------------------------
+// Turns a thrown error (e.g. /error) into a clean 500 with a readable body, so
+// the 500 status line is the lesson rather than a noisy stack trace.
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  res
+    .status(500)
+    .type('text/plain')
+    .send(`500 Internal Server Error — ${err.message}`);
+});
+
 module.exports = app;
