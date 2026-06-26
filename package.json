@@ -1,0 +1,19 @@
+{
+  "name": "wireshark-lab-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Deliberately insecure teaching site for learning packet analysis with Wireshark. Lab/localhost only.",
+  "main": "src/server-http.js",
+  "scripts": {
+    "start": "node src/server-http.js",
+    "start:http": "node src/server-http.js",
+    "start:https": "node src/server-https.js",
+    "gen-cert": "node -e \"console.log('Run the openssl command from README.md to generate certs/key.pem and certs/cert.pem')\""
+  },
+  "dependencies": {
+    "ejs": "3.1.10",
+    "express": "4.21.2",
+    "express-session": "1.18.1",
+    "multer": "2.0.1"
+  }
+}

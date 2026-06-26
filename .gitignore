@@ -1,0 +1,13 @@
+node_modules/
+
+# Self-signed cert is generated per-machine; never commit it.
+certs/
+*.pem
+
+# Uploaded files from the /upload lesson.
+uploads/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log

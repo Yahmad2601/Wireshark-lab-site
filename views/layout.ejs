@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= typeof title !== 'undefined' ? title : 'Wireshark Lab' %></title>
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+  <!-- Persistent insecure-site banner, required on every page. -->
+  <div class="insecure-banner" role="alert"><%= bannerText %></div>
+
+  <header class="site-header">
+    <a class="brand" href="/">🦈 Wireshark Lab by Ahmad Yahaya</a>
+    <nav class="site-nav">
+      <a href="/">Lessons</a>
+      <% if (typeof user !== 'undefined' && user) { %>
+        <span class="who">signed in as <strong><%= user %></strong></span>
+      <% } %>
+    </nav>
+  </header>
+
+  <main class="content">
+    <%- body %>
+  </main>
+
+  <footer class="site-footer">
+    <span>Isolated lab / localhost only · holds no real data · plain HTTP on :8080, HTTPS twin on :8443</span>
+  </footer>
+
+  <script src="/public/js/main.js"></script>
+</body>
+</html>

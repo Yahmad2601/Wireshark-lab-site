@@ -1,0 +1,43 @@
+<section>
+  <h1>Login</h1>
+  <p class="lede">
+    Submitting this form sends <code>username</code> and <code>password</code>
+    as an <code>application/x-www-form-urlencoded</code> POST body. Over plain
+    HTTP that body is cleartext.
+  </p>
+
+  <% if (welcome && user) { %>
+    <p class="tip">✅ Signed in as <strong><%= user %></strong>. The server set a
+    <code>lab.sid</code> session cookie — watch it ride along on every later
+    request.</p>
+    <form class="lab-form" method="POST" action="/logout">
+      <button type="submit">Log out</button>
+    </form>
+  <% } else { %>
+    <% if (error) { %>
+      <p class="error" style="color:#ff6b6b;font-weight:700;"><%= error %></p>
+    <% } %>
+
+    <form class="lab-form" method="POST" action="/login">
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text" autocomplete="off" value="<%= demoUser %>">
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="off" value="<%= demoPass %>">
+
+      <button type="submit">Log in</button>
+    </form>
+
+    <p class="tip">Demo credentials (fake): <code><%= demoUser %></code> /
+    <code><%= demoPass %></code></p>
+  <% } %>
+</section>
+
+<section>
+  <h2>Capture this</h2>
+  <ul>
+    <li>Display filter: <code>http.request.method == "POST" &amp;&amp; http.request.uri == "/login"</code></li>
+    <li>Right-click the POST → <strong>Follow → HTTP Stream</strong> to read the credentials in cleartext.</li>
+    <li>Then watch the <code>Set-Cookie: lab.sid=…</code> on the response and the <code>Cookie:</code> header on the next request.</li>
+  </ul>
+</section>

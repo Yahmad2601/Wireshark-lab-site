@@ -1,0 +1,64 @@
+<section class="hero">
+  <h1>Wireshark Packet-Analysis Lab</h1>
+  <p class="lede">
+    Each link below performs <strong>one action</strong> in your browser. Do it,
+    then find that exact request inside your capture. Every lesson is a single,
+    distinct Wireshark concept — start your capture, click, and dissect.
+  </p>
+  <p class="tip">
+    Capture on the loopback interface (Npcap "Adapter for loopback traffic" on
+    Windows). Try each action over plain HTTP <code>:8080</code>, then over the
+    HTTPS twin <code>:8443</code>, and compare what you can read.
+  </p>
+</section>
+
+<section class="lessons">
+  <h2>Lessons</h2>
+  <ul class="lesson-grid">
+    <li>
+      <a href="/login">/login</a>
+      <span>POST urlencoded credentials → <em>Follow HTTP Stream</em> reveals user + password in cleartext.</span>
+    </li>
+    <li>
+      <a href="/search?q=example">/search</a>
+      <span>Query string in the URL → why GET leaks sensitive data into URLs, logs and history.</span>
+    </li>
+    <li>
+      <a href="/register">/register</a>
+      <span>Many fields (email, phone, dropdown, checkbox) → a richer urlencoded body.</span>
+    </li>
+    <li>
+      <a href="/upload">/upload</a>
+      <span>multipart/form-data → <em>Export Objects → HTTP</em> carves the file back out.</span>
+    </li>
+    <li>
+      <a href="/api/data">/api/data</a>
+      <span>JSON response → dissect <code>Content-Type: application/json</code>.</span>
+    </li>
+    <li>
+      <a href="/secret">/secret</a>
+      <span>HTTP Basic Auth → <code>Authorization: Basic</code> is Base64, not encryption.</span>
+    </li>
+    <li>
+      <a href="/assets-demo">/assets-demo</a>
+      <span>One page, several local assets → many parallel requests, keep-alive, filtering practice.</span>
+    </li>
+    <li>
+      <a href="/broken">/broken</a>
+      <span>404 signature on the wire.</span>
+    </li>
+    <li>
+      <a href="/redirect">/redirect</a>
+      <span>301/302 → follow a redirect chain in the capture.</span>
+    </li>
+    <li>
+      <a href="/error">/error</a>
+      <span>500 → error signature on the wire.</span>
+    </li>
+  </ul>
+</section>
+
+<section class="creds">
+  <h2>Demo credentials (fake — never real)</h2>
+  <p>User <code>student</code> · Password <code>packets123</code></p>
+</section>

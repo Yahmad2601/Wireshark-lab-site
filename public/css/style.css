@@ -1,0 +1,143 @@
+/* Local stylesheet — no remote fonts or CDNs, so captures stay clean. */
+
+:root {
+  --bg: #0f1419;
+  --panel: #1b232d;
+  --ink: #e6edf3;
+  --muted: #9aa7b4;
+  --accent: #4fc3f7;
+  --warn-bg: #b00020;
+  --warn-ink: #ffffff;
+  --border: #2b3742;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+.insecure-banner {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 10px 14px;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.site-nav a {
+  color: var(--accent);
+  text-decoration: none;
+  margin-left: 16px;
+}
+
+.site-nav .who { color: var(--muted); margin-left: 16px; }
+
+.content {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 28px 24px 64px;
+}
+
+h1 { font-size: 1.9rem; margin: 0 0 12px; }
+h2 { margin-top: 36px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+
+.lede { font-size: 1.1rem; color: var(--ink); }
+.tip { color: var(--muted); }
+
+code {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.92em;
+}
+
+.lesson-grid {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.lesson-grid li {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.lesson-grid a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+  font-family: "Cascadia Code", Consolas, monospace;
+}
+
+.lesson-grid span { display: block; color: var(--muted); margin-top: 4px; }
+
+.creds p { font-size: 1.05rem; }
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 18px 24px 36px;
+}
+
+/* Forms (used by later lessons). */
+form.lab-form {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 440px;
+}
+
+.lab-form label { display: block; margin: 12px 0 4px; color: var(--muted); }
+
+.lab-form input, .lab-form select {
+  width: 100%;
+  padding: 9px 10px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.lab-form button {
+  margin-top: 18px;
+  background: var(--accent);
+  color: #04222e;
+  font-weight: 700;
+  border: 0;
+  border-radius: 6px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
