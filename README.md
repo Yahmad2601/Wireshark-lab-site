@@ -242,8 +242,7 @@ Log in **once over HTTP** and **once over HTTPS**, capturing both.
 
 ## Challenge prompts
 
-Give students the **prompt** and the **guide** (the filter/steps to get there) —
-let them find and report the result themselves. Filters are display filters
+Using the **prompt** and the **guide** (the filter/steps to get there) find and report the results. Filters are display filters
 unless noted. (Assume HTTP on `:8080` over loopback.)
 
 ### A. Reading cleartext

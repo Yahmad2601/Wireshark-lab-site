@@ -12,6 +12,7 @@ uploads/
 Thumbs.db
 *.log
 
+# Instructor-only context — not for the public student repo
 CLAUDE.md
 .claude/
-.txt
+*.txt
