@@ -4,9 +4,12 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const app = require('./app');
-const { enforceBindGuard } = require('./guard');
+const { enforceBindGuard, privateIPv4s } = require('./guard');
 
-const HOST = process.env.HOST || '127.0.0.1';
+// Default to 0.0.0.0 (all IPv4 interfaces) so loopback AND the LAN are served
+// by one bind — same rationale as server-http.js. Override with HOST to pin one
+// address. The guard refuses the wildcard if any interface is public.
+const HOST = process.env.HOST || '0.0.0.0';
 const PORT = Number(process.env.HTTPS_PORT) || 8443;
 
 const CERT_DIR = path.join(__dirname, '..', 'certs');
@@ -30,6 +33,13 @@ const options = {
   cert: fs.readFileSync(CERT),
 };
 
+// Build the list of URLs this bind is actually reachable at.
+function reachableUrls() {
+  const wildcard = HOST === '0.0.0.0' || HOST === '::' || HOST === '';
+  const hosts = wildcard ? ['127.0.0.1', ...privateIPv4s()] : [HOST];
+  return hosts.map((h) => `https://${h}:${PORT}`);
+}
+
 // SAME app as server-http.js — identical routes. The only difference on the
 // wire is TLS. That's what makes the HTTP-vs-HTTPS capture contrast valid:
 // capture /login on :8080 (everything visible) vs :8443 (TLS Application Data,
@@ -37,7 +47,7 @@ const options = {
 https.createServer(options, app).listen(PORT, HOST, () => {
   console.log('');
   console.log('  Wireshark Lab Site — HTTPS twin (self-signed; browser will warn)');
-  console.log(`  https://${HOST}:${PORT}`);
+  reachableUrls().forEach((u) => console.log('  ' + u));
   console.log('  Same routes as :8080 — capture the same action and compare in Wireshark.');
   console.log('  In the capture you will see only TLS Application Data, not the cleartext.');
   console.log('');

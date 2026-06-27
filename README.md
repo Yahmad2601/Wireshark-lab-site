@@ -75,6 +75,9 @@ npm run start:https
 Seeded demo login: **username** `student` · **password** `packets123`
 (fake — for demonstration only).
 
+On startup the server prints every URL it's reachable at — the loopback address
+plus each LAN address — so just copy the one you need from the terminal.
+
 Capture on the interface carrying lab traffic. On localhost, capture on the
 loopback adapter; on a lab LAN, capture on the relevant Ethernet/WiFi NIC.
 
@@ -82,34 +85,38 @@ loopback adapter; on a lab LAN, capture on the relevant Ethernet/WiFi NIC.
 
 ## Accessing it from other devices on the lab LAN
 
-By default both servers bind to `127.0.0.1` (loopback) — reachable only from
-this machine. To reach the site from another device on the same isolated
-network, bind to a private LAN address with the `HOST` env var:
+**This works out of the box — no extra flags.** By default both servers bind to
+`0.0.0.0` (every IPv4 interface), which serves loopback **and** the LAN at once.
+On startup the terminal lists the reachable URLs, e.g.:
+
+```
+http://127.0.0.1:8080      <- this machine
+http://192.168.1.5:8080    <- other devices on the same network
+```
+
+From the other device, just browse to the LAN URL shown (`http://<lan-ip>:8080`
+or `https://<lan-ip>:8443`). The other device must be on the **same** network
+(some routers/hotspots isolate clients — disable "AP/Client Isolation" if peers
+can't reach each other).
+
+To **restrict** or **pin** the bind, set the `HOST` env var:
 
 ```powershell
-# Option A — bind this machine's specific LAN IP (e.g. 192.168.1.5)
-$env:HOST="192.168.1.5"; npm run start:http
-$env:HOST="192.168.1.5"; npm run start:https
-
-# Option B — bind ALL interfaces. The startup guard allows 0.0.0.0 ONLY when
-# every non-loopback address on this machine is private; if any interface has a
-# public address it refuses (use --allow-public to override on an isolated lab).
-$env:HOST="0.0.0.0"; npm run start:http
+$env:HOST="127.0.0.1"; npm run start:http   # loopback only (no LAN access)
+$env:HOST="192.168.1.5"; npm run start:http  # pin one specific LAN interface
 ```
 
 ```bash
 # macOS / Linux equivalent
+HOST=127.0.0.1   npm run start:http
 HOST=192.168.1.5 npm run start:http
-HOST=0.0.0.0     npm run start:http
 ```
-
-Then, from the other device, browse to `http://<lan-ip>:8080` or
-`https://<lan-ip>:8443`.
 
 Notes:
 - The guard permits private binds (`10.x`, `172.16–31.x`, `192.168.x`) and the
-  `0.0.0.0` wildcard on an all-private machine. A genuinely public bind still
-  requires the explicit `--allow-public` flag.
+  default `0.0.0.0` wildcard on an all-private machine. If the machine has a
+  **public** address, the guard refuses to start unless you pass the explicit
+  `--allow-public` flag.
 - `npm run gen-cert` automatically adds every private IPv4 on this machine to
   the certificate's SAN, so the HTTPS twin validates over the LAN without a
   name-mismatch warning. **Re-run `gen-cert` if your LAN IP changes** (DHCP

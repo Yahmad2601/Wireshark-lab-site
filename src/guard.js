@@ -77,6 +77,20 @@ function machineAddressesAllPrivate(family) {
   return { allPrivate: publicAddrs.length === 0, addrs, publicAddrs };
 }
 
+// This machine's private, non-internal IPv4 addresses (e.g. the LAN IP). Used
+// to print reachable URLs and to build the HTTPS cert SAN.
+function privateIPv4s() {
+  const out = [];
+  const ifaces = os.networkInterfaces();
+  for (const name of Object.keys(ifaces)) {
+    for (const ni of ifaces[name] || []) {
+      if (ni.internal || ni.family !== 'IPv4') continue;
+      if (isPrivateIPv4(ni.address)) out.push(ni.address);
+    }
+  }
+  return [...new Set(out)];
+}
+
 function refuse(lines, allowPublic) {
   console.error('');
   console.error('  ============================================================');
@@ -144,5 +158,6 @@ module.exports = {
   isPrivateBindAddress,
   isPrivateIPv4,
   isPrivateIPv6,
+  privateIPv4s,
   enforceBindGuard,
 };
