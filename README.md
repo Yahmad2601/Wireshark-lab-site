@@ -61,9 +61,11 @@ below.
 
 ## Running it
 
-```bash
-npm install
+Once installed (see
+[setup](#getting-it-onto-a-lab-machine-students-start-here)), the day-to-day
+commands are:
 
+```bash
 # Plain HTTP (the main teaching surface) — port 8080
 npm run start:http
 
@@ -78,8 +80,43 @@ Seeded demo login: **username** `student` · **password** `packets123`
 On startup the server prints every URL it's reachable at — the loopback address
 plus each LAN address — so just copy the one you need from the terminal.
 
-Capture on the interface carrying lab traffic. On localhost, capture on the
-loopback adapter; on a lab LAN, capture on the relevant Ethernet/WiFi NIC.
+---
+
+## Starting your Wireshark capture
+
+The browser and server are only half the lab — the packets are the point. Set up
+the capture **before** you perform the action you want to study.
+
+1. **Launch Wireshark.** The welcome screen lists your capture interfaces.
+2. **Pick the interface that matches where the traffic flows:**
+   - **Browser and server on the same machine** (you're visiting `127.0.0.1`) →
+     choose the **loopback** interface:
+     - **Windows:** *"Adapter for loopback traffic capture"* (provided by Npcap —
+       install Npcap *with* loopback support; it ships with the Wireshark
+       installer).
+     - **Linux:** *"Loopback: lo"*.
+     - **macOS:** *"Loopback: lo0"*.
+   - **Traffic from another device** over the LAN → choose your real **Wi-Fi or
+     Ethernet** adapter instead (loopback won't see that traffic).
+3. **Optionally pre-filter to keep the capture clean.** In the green *capture
+   filter* bar on the welcome screen, type `tcp port 8080` (HTTP) or
+   `tcp port 8443` (HTTPS). Note: *capture* filters use BPF syntax
+   (`tcp port 8080`) — different from the *display* filters used later
+   (`http`, `tcp.port == 8080`).
+4. **Start the capture:** double-click the interface, or select it and click the
+   blue **shark-fin** (▶). Packets begin scrolling.
+5. **Do the action in the browser** — e.g. submit the `/login` form.
+6. **Stop the capture** with the red **square** (■) so the trace doesn't keep
+   growing.
+7. **Apply a display filter** to zoom in (e.g.
+   `http.request.method == "POST" && http.request.uri == "/login"`), then
+   right-click a packet → **Follow → HTTP Stream**.
+
+> **Seeing nothing on loopback?** Usual causes: wrong interface selected; Npcap
+> installed without loopback support (re-run the Npcap installer and tick it); or
+> the browser answered from cache — hard-refresh with **Ctrl+F5** to force a real
+> request. Confirm the server is actually on `127.0.0.1:8080` (it prints this on
+> startup).
 
 ---
 
@@ -129,7 +166,7 @@ Notes:
 
 ## The core contrast (do this first)
 
-Have students log in **once over HTTP** and **once over HTTPS**, capturing both.
+Log in **once over HTTP** and **once over HTTPS**, capturing both.
 
 - **HTTP:** filter `http`, find the `POST /login`, right-click → Follow → HTTP
   Stream. Username and password are in plain sight in the request body.
@@ -152,7 +189,7 @@ Have students log in **once over HTTP** and **once over HTTPS**, capturing both.
 ### 2. `GET /search` — sensitive data in the URL
 - **Filter:** `http.request.uri contains "/search"`
 - **See:** the query sits in the request line itself (`GET /search?q=...`).
-  Discuss how URLs land in server logs, browser history, and `Referer`
+  Understand how URLs land in server logs, browser history, and `Referer`
   headers — so GET is even worse than POST for secrets.
 
 ### 3. `POST /register` — richer form body
@@ -169,8 +206,7 @@ Have students log in **once over HTTP** and **once over HTTPS**, capturing both.
 ### 5. Session cookie — `Set-Cookie` and replay
 - **Filter:** `http.cookie || http.set_cookie`
 - **See:** the server's `Set-Cookie` in the login response, then the `Cookie`
-  header riding on every later request. Copy the value and discuss session
-  hijacking: anyone who captures this can impersonate the session.
+  header riding on every later request. Copy the value to understand session hijacking: anyone who captures this can impersonate the session.
 
 ### 6. `GET /api/data` — content-type dissection
 - **Filter:** `http.request.uri == "/api/data"`
@@ -204,12 +240,87 @@ Have students log in **once over HTTP** and **once over HTTPS**, capturing both.
 6. `/secret` Basic Auth → encoding vs encryption.
 7. Status codes + `/assets-demo` → reading real-world request flows.
 
-## Challenge prompts for students
-- "Log in, then find your password in the capture. Which filter got you there?"
-- "Find the session cookie and report its value."
-- "Which frame uploaded the file? Export it and confirm its contents."
-- "Decode the Basic Auth header. What does this prove about Base64?"
-- "Capture the HTTPS login. What can you still learn about it despite TLS?"
+## Challenge prompts
+
+Give students the **prompt** and the **guide** (the filter/steps to get there) —
+let them find and report the result themselves. Filters are display filters
+unless noted. (Assume HTTP on `:8080` over loopback.)
+
+### A. Reading cleartext
+
+**A1.** *"Log in, then find your password in the capture. Which filter got you
+there?"*
+- **Guide:** `http.request.method == "POST" && http.request.uri == "/login"` →
+  right-click → **Follow → HTTP Stream**.
+
+**A2.** *"Without using Follow Stream, read the `secret` value someone typed into
+`/search`."*
+- **Guide:** `http.request.uri contains "/search"`; look at the **request line /
+  `http.request.uri`** in the packet detail.
+
+**A3.** *"What `Content-Type` did `/api/data` return, and what's the value of the
+`you` field?"*
+- **Guide:** `http.request.uri == "/api/data"`; expand the response's
+  **JavaScript Object Notation** tree.
+
+### B. Cookies & sessions
+
+**B1.** *"Find the session cookie and report its value."*
+- **Guide:** `http.set_cookie` for the issuing response, then `http.cookie` for
+  the replays.
+
+**B2.** *"Prove the cookie alone is enough to impersonate the session (no
+password)."*
+- **Guide:** copy the `lab.sid` value from the capture and replay a request with
+  it, e.g.
+  `curl -H "Cookie: lab.sid=<value>" http://127.0.0.1:8080/api/data`.
+
+### C. Encodings & file carving
+
+**C1.** *"On `/register`, find the email field on the wire. How is the `@`
+encoded, and what happens to the newsletter checkbox when unticked?"*
+- **Guide:** `http.request.uri == "/register"` → Follow HTTP Stream, or expand
+  **HTML Form URL Encoded** in the detail pane.
+
+**C2.** *"Which frame uploaded the file? Export it and confirm its contents."*
+- **Guide:** `http.request.method == "POST" && http.request.uri == "/upload"` →
+  **File → Export Objects → HTTP** → select the request → **Save**.
+
+**C3.** *"Decode the Basic Auth header. What does this prove about Base64?"*
+- **Guide:** `http.authorization`; Wireshark also shows a decoded **Credentials**
+  field under the Authorization header, or decode the Base64 by hand.
+
+### D. Status codes & flow
+
+**D1.** *"List every hop when you visit `/redirect`: each status code and its
+`Location`."*
+- **Guide:** `http.response.code >= 300 && http.response.code < 400` plus the
+  final 200.
+
+**D2.** *"Find the 404 and the 500. How do their response lines differ?"*
+- **Guide:** `http.response.code == 404 || http.response.code == 500`.
+
+**D3.** *"On `/assets-demo`, how many requests under `/public/` does one page load
+make, and do they reuse TCP connections?"*
+- **Guide:** `http.request.uri contains "/public/"` to count; check the
+  **tcp.stream** index / look for keep-alive (no new handshake per asset).
+
+### E. TCP & TLS
+
+**E1.** *"Identify the TCP 3-way handshake just before the `/login` POST. How many
+packets and which flags?"*
+- **Guide:** `tcp.port == 8080 && tcp.flags.syn == 1` to spot the SYNs; then read
+  the three frames in order.
+
+**E2.** *"Capture the HTTPS login. What can you still learn about it despite
+TLS?"*
+- **Guide:** `tls && tcp.port == 8443`; inspect the **Client Hello**, the
+  certificate, and the packet sizes/timing.
+
+**E3.** *"Compare the same `/login` over HTTP vs HTTPS side by side. One sentence:
+what changed and what didn't?"*
+- **Guide:** capture `/login` once on `:8080` (filter `http`) and once on
+  `:8443` (filter `tls`); compare what's readable in the request/response.
 
 ---
 
